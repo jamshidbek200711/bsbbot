@@ -1,6 +1,12 @@
 const TelegramBot = require('node-telegram-bot-api');
 const token = '7802625373:AAFKEoLo-a4ODuKDlNni0p_38dqTpgwgR5M'; // O'zingizning tokeningizni yozing
 const bot = new TelegramBot(token, { polling: true });
+const home = JSON.stringify({
+  resize_keyboard: true,
+  keyboard: [ 
+      [`Fan tanlash`]
+  ]
+});
 
 // Boshlang'ich inline tugmalar
 const subjects = [
@@ -42,22 +48,33 @@ const links = {
 
 // /start komandasi bo'yicha bot inline tugmalarni jo'natadi
 function sendSubjectOptions(chatId) {
-  bot.sendMessage(chatId, 'Fanni tanlang:', {
+  bot.sendMessage(chatId, 'Fanlar:', {
     reply_markup: {
       inline_keyboard: subjects
     }
   });
 }
 
+
+
+
+bot.onText(/\/start/, (msg) => {
+    const firstName = msg.chat.first_name;
+    const chatId = msg.chat.id;
+    const option = {
+        reply_to_message_id: msg.message_id,
+        parse_mode: "markdown",
+        reply_markup: JSON.parse(home),
+        resize_keybord: true 
+      };
+      bot.sendMessage(chatId, `Fanni tanlang janob kochirmachi ${firstName}❗️`, option);
+});
 // Botga foydalanuvchi xabar yuborganida trigger bo'ladi
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  
   // Agar foydalanuvchi /start deb yozsa, faqat u holda fanni tanlash tugmachalarini ko'rsatamiz
-  if (msg.text === '/start') {
+  if (msg.text === `Fan tanlash`) {
     sendSubjectOptions(chatId);
-  } else {
-    bot.sendMessage(chatId, 'Iltimos, fanni tanlash uchun /start deb yozing.');
   }
 });
 
